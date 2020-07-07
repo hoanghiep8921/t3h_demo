@@ -24,9 +24,5 @@ public class ToolEditApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
-        //FileModel currentFolder = fileService.getFileInFolderByPath(Arrays.asList("hiepdh","mainpage"),rootFolder);
-        JsonModel jsonModel = fileService.readFileJson("folderTest/hiepdh/userinfo.json");
-        System.out.println(jsonModel);
     }
 }

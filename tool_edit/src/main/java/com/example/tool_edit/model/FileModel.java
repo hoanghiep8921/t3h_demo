@@ -2,18 +2,36 @@ package com.example.tool_edit.model;
 
 import java.util.List;
 
-public class FileModel {
+public class FileModel implements Comparable {
     private String name;
-    private long size;
+    private double size;
     private String type;
     private boolean isDirectory;
     private String path;
     private String pathJson;
-    private String pathJsonFormat;
     private String pathFormat;
+    private String pathJsonFormat;
+    private String parent;
+    private String parentFormat;
     private long lastModified;
-    private FileModel parent;
     private List<FileModel> children;
+    private boolean isConfirm;
+
+    public String getParentFormat() {
+        return parentFormat;
+    }
+
+    public void setParentFormat(String parentFormat) {
+        this.parentFormat = parentFormat;
+    }
+
+    public boolean isConfirm() {
+        return isConfirm;
+    }
+
+    public void setConfirm(boolean confirm) {
+        isConfirm = confirm;
+    }
 
     public String getPathJsonFormat() {
         return pathJsonFormat;
@@ -39,11 +57,11 @@ public class FileModel {
         this.pathFormat = pathFormat;
     }
 
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 
-    public void setSize(long size) {
+    public void setSize(double size) {
         this.size = size;
     }
 
@@ -87,11 +105,11 @@ public class FileModel {
         this.name = name;
     }
 
-    public FileModel getParent() {
+    public String getParent() {
         return parent;
     }
 
-    public void setParent(FileModel parent) {
+    public void setParent(String parent) {
         this.parent = parent;
     }
 
@@ -101,5 +119,20 @@ public class FileModel {
 
     public void setChildren(List<FileModel> children) {
         this.children = children;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        FileModel other = (FileModel)o;
+        if(this.isConfirm && other.isConfirm){
+            return 0;
+        }
+        if(this.isConfirm && !other.isConfirm){
+            return 1;
+        }
+        if(!this.isConfirm && other.isConfirm){
+            return -1;
+        }
+        return 0;
     }
 }

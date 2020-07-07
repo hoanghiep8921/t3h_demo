@@ -8,15 +8,36 @@ import com.google.gson.Gson;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import static com.example.tool_edit.util.Constant.rootFolder;
 
 @Service
 public class FileService {
+    private Logger logger = LoggerFactory.getLogger(FileService.class);
     private FileWriter file;
+    @Value("${root.folder}")
+    private String rootFolderPath;
+
+    public void loadFolder(){
+        File folder = new File(rootFolderPath);
+        //init root folder model
+        rootFolder.setName(rootFolderPath);
+        rootFolder.setDirectory(true);
+        rootFolder.setParent(null);
+        rootFolder.setChildren(new ArrayList<>());
+
+        //put all children file to root
+        listFilesForFolder(folder,rootFolder,"");
+    }
     public JsonModel readFileJson(String filePath){
         //JSON parser object to parse read file
         JSONParser jsonParser = new JSONParser();
@@ -60,12 +81,16 @@ public class FileService {
     }
     public void listFilesForFolder(final File folder,FileModel fileModel,String pathJson) {
         String pathJsonFile = "";
+
         if(folder.getName().contains("mainpage")){
             pathJsonFile = pathJson;
         }
         for (final File fileEntry : folder.listFiles()) {
-            if(fileEntry.getName().contains(".json")){
+            if(fileEntry.getName().contains("gt.json")){
                 pathJsonFile = fileEntry.getPath();
+            }
+            if(fileEntry.getName().contains("confirm.txt")){
+                fileModel.setConfirm(true);
             }
         }
 
@@ -74,11 +99,18 @@ public class FileService {
             FileModel childFile = new FileModel();
             childFile.setPathJson(pathJson);
             childFile.setPathJsonFormat(pathJson.replaceAll("\\\\",","));
+            childFile.setPathJsonFormat(childFile.getPathJsonFormat().replaceAll("/",","));
+            if(fileEntry.getName().contains("gt.json")){
+                childFile.setPathJson(fileEntry.getPath());
+                childFile.setPathJsonFormat(fileEntry.getPath().replaceAll("\\\\",","));
+                childFile.setPathJsonFormat(childFile.getPathJsonFormat().replaceAll("/",","));
+            }
             childFile.setChildren(new ArrayList<>());
             childFile.setName(fileEntry.getName());
             childFile.setDirectory(fileEntry.isDirectory());
             childFile.setPath(fileEntry.getPath());
             childFile.setPathFormat(fileEntry.getPath().replaceAll("\\\\",","));
+            childFile.setPathFormat(childFile.getPathFormat().replaceAll("/",","));
             childFile.setLastModified(fileEntry.lastModified());
             childFile.setSize(Utils.bytesToMegabyte(fileEntry.length()));
             childFile.setType(Files.getFileExtension(fileEntry.getName()));
@@ -86,15 +118,30 @@ public class FileService {
             fileModel.getChildren().add(childFile);
             //nếu file con là folder thì đệ quy
             if (fileEntry.isDirectory()) {
-                childFile.setParent(fileModel);
+//                childFile.setParent(fileModel.getPath());
+//                childFile.setParentFormat(fileModel.getPath().replaceAll("\\\\",","));
                 long folderSize = Utils.folderSize(fileEntry);
                 childFile.setSize(Utils.bytesToMegabyte(folderSize));
                 listFilesForFolder(fileEntry,childFile,pathJsonFile);
             } else {
                 if(fileEntry.listFiles() == null || fileEntry.listFiles().length == 0)
-                    System.out.println("Hết file");
+                    System.out.println(" ");
             }
         }
+    }
+    public void createFileConfirm(String path) throws Exception {
+        File file = new File(path + File.separator +"confirm.txt");
+        //Create the file
+        if (file.createNewFile()) {
+            System.out.println("File is created!");
+        } else {
+            throw new Exception("File exits");
+        }
+        FileWriter writer = new FileWriter(file);
+        writer.write("Time confirmed : " + new Date().toString());
+        writer.close();
+        loadFolder();
+
     }
     public FileModel getFileInFolderByPath(List<String> breadcrumb,FileModel rootFolder){
         FileModel currentFolder = rootFolder;

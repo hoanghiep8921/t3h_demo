@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import static com.example.tool_edit.util.Constant.rootFolder;
 
@@ -34,16 +35,7 @@ public class HomeController {
     FileService fileService;
     @PostConstruct
     public void initRootFolder(){
-        File folder = new File(rootFolderPath);
-        //init root folder model
-
-        rootFolder.setName(rootFolderPath);
-        rootFolder.setParent(null);
-        rootFolder.setChildren(new ArrayList<>());
-
-        //put all children file to root
-        fileService.listFilesForFolder(folder,rootFolder,"");
-
+        fileService.loadFolder();
     }
 
     @RequestMapping("/home")
@@ -74,6 +66,7 @@ public class HomeController {
 
         //get currentFolder by path
         FileModel currentFolder = fileService.getFileInFolderByPath(breadcrumb,rootFolder);
+        Collections.sort(currentFolder.getChildren());
         model.addAttribute("currentFolder",currentFolder);
         model.addAttribute("rootFolder",rootFolder);
         model.addAttribute("renderBreadCrumb",renderBreadCrumb);
@@ -98,6 +91,21 @@ public class HomeController {
         }
         return jsonModel;
     }
+
+    @GetMapping("/confirm")
+    @ResponseBody
+    public String confirmFile(@RequestParam("path")String path){
+        try{
+            path = path.replaceAll(",gt.json","");
+            path = path.replaceAll(",","/");
+            fileService.createFileConfirm(path);
+        }catch (Exception e){
+            e.printStackTrace();
+            return e.getMessage();
+        }
+        return "Thành công";
+    }
+
     @PostMapping("/writeJson")
     @ResponseBody
     public String writeJson(@RequestParam("path")String path,
@@ -109,7 +117,7 @@ public class HomeController {
             path = path.replaceAll(",","/");
             Gson gson = new Gson();
             String jsonString = gson.toJson(jsonModel);
-//            fileService.writeJsonToFile(jsonString,path);
+            fileService.writeJsonToFile(jsonString,path);
         }catch (Exception e){
             e.printStackTrace();
             return e.getMessage();

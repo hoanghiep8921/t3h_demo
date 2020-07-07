@@ -220,14 +220,15 @@
                 <th>Tên</th>
                 <th>Type</th>
                 <th>Kích thước</th>
-                <th>Ngày tạo</th>
+                <th>Ngày cập nhập</th>
                 <th>Thao tác</th>
             </tr>
         </thead>
         <tbody>
             <tr th:if="${currentFolder != null && currentFolder.isDirectory()}"
                 th:each="folder : ${currentFolder.getChildren()}" class='$class'>
-                <td><a th:text="${folder.getName()}"></a></td>
+                <td><a style="display: inline-block" th:text="${folder.getName()}"></a>
+                    <span th:if="${folder.isConfirm()}" style="background-color: green;border-radius: 50%;height:10px;width: 10px;display: inline-block"></span></td>
                 <td><a th:text="${folder.getType()}"></a></td>
                 <td><a th:text="${folder.getSize() +' MB'}"></a></td>
                 <td><a th:text="${#dates.format(folder.getLastModified(), 'dd-MM-yyyy HH:mm:ss')}"></a></td>
@@ -239,73 +240,79 @@
         </tbody>
     </table>
     <hr />
-    <div class="container" th:if="${!currentFolder.isDirectory()}">
+    <div class="container-fluid" th:if="${!currentFolder.isDirectory()}">
         <div class="row">
-            <div class="col-md-12" th:if="${currentFolder != null && !currentFolder.isDirectory()}">
-                <img th:src='@{${"show?fileName=" + currentFolder.getPathFormat()}}' width="600px" height="400px" />
+            <div class="col-md-6" th:if="${currentFolder != null && !currentFolder.isDirectory()}">
+                <img th:if="${!currentFolder.getName().contains('.json')}"
+                     th:src='@{${"show?fileName=" + currentFolder.getPathFormat()}}' width="400px" height="500px" />
             </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label >Type :</label>
-                    <input type="text" class="form-control" id="type">
-                </div>
-                <div class="form-group">
-                    <label>CODE :</label>
-                    <input type="text" class="form-control" id="code" >
-                </div>
-                <div class="form-group">
-                    <label >Passport Number :</label>
-                    <input type="text" class="form-control" id="passportNumber">
-                </div>
-                <div class="form-group">
-                    <label>Name :</label>
-                    <input type="text" class="form-control" id="name">
-                </div>
-                <div class="form-group">
-                    <label >Nationality :</label>
-                    <input type="text" class="form-control" id="nationality">
-                </div>
-                <div class="form-group">
-                    <label>Date Of Birth :</label>
-                    <input type="text" class="form-control" id="dateOfBirth" >
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label >Place Of Birth :</label>
-                    <input type="text" class="form-control" id="placeOfBirth">
+            <div th:class="${!currentFolder.getName().contains('.json') ? 'col-md-6' : 'col-md-12'}">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label >Type :</label>
+                            <input type="text" class="form-control" id="type">
+                        </div>
+                        <div class="form-group">
+                            <label>CODE :</label>
+                            <input type="text" class="form-control" id="code" >
+                        </div>
+                        <div class="form-group">
+                            <label >Passport Number :</label>
+                            <input type="text" class="form-control" id="passportNumber">
+                        </div>
+                        <div class="form-group">
+                            <label>Name :</label>
+                            <input type="text" class="form-control" id="name">
+                        </div>
+                        <div class="form-group">
+                            <label >Nationality :</label>
+                            <input type="text" class="form-control" id="nationality">
+                        </div>
+                        <div class="form-group">
+                            <label>Date Of Birth :</label>
+                            <input type="text" class="form-control" id="dateOfBirth" >
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label >Place Of Birth :</label>
+                            <input type="text" class="form-control" id="placeOfBirth">
 
-                </div>
-                <div class="form-group">
-                    <label>Sex :</label>
-                    <input type="text" class="form-control" id="sex">
-                </div>
-                <div class="form-group">
-                    <label>IssueDate :</label>
-                    <input type="text" class="form-control" id="issueDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Sex :</label>
+                            <input type="text" class="form-control" id="sex">
+                        </div>
+                        <div class="form-group">
+                            <label>IssueDate :</label>
+                            <input type="text" class="form-control" id="issueDate">
 
-                </div>
-                <div class="form-group">
-                    <label>ExpiryDate :</label>
-                    <input type="text" class="form-control" id="expiryDate">
-                </div>
-                <div class="form-group">
-                    <label>IssuePlace :</label>
-                    <input type="text" class="form-control" id="issuePlace" >
-                </div>
-                <div class="form-group">
-                    <label>Mrz1 :</label>
-                    <input type="text" class="form-control" id="mrz1">
-                    <small class="form-text text-muted">Thông tin hộ chiếu.</small>
-                </div>
-                <div class="form-group">
-                    <label>Mrz2 :</label>
-                    <input type="text" class="form-control" id="mrz2">
-                    <small class="form-text text-muted">Thông tin hộ khẩu</small>
+                        </div>
+                        <div class="form-group">
+                            <label>ExpiryDate :</label>
+                            <input type="text" class="form-control" id="expiryDate">
+                        </div>
+                        <div class="form-group">
+                            <label>IssuePlace :</label>
+                            <input type="text" class="form-control" id="issuePlace" >
+                        </div>
+                        <div class="form-group">
+                            <label>Mrz1 :</label>
+                            <input type="text" class="form-control" id="mrz1">
+                            <small class="form-text text-muted">Thông tin hộ chiếu.</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Mrz2 :</label>
+                            <input type="text" class="form-control" id="mrz2">
+                            <small class="form-text text-muted">Thông tin hộ khẩu</small>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="text-center">
+            <div class="col-md-12 text-center">
                 <button class="btn btn-success" onclick="writeJson()">Lưu</button>
+                <button class="btn btn-primary" onclick="confirmFile()">Xác nhận hoàn thành</button>
             </div>
         </div>
     </div>
@@ -319,6 +326,7 @@
     var jsonModel = [[${currentFolder}]];
     console.log(jsonModel);
     var readJsonUrl = /*[[@{/readJson}]]*/ "/readJson";
+    var confirmJsonUrl = /*[[@{/confirm}]]*/ "/confirm";
     var writeJsonUrl = /*[[@{/writeJson}]]*/ "/writeJson";
 
     if(!jsonModel.directory){
@@ -348,6 +356,16 @@
         })
     }
 
+    function confirmFile() {
+        $.ajax({
+            type:"GET",
+            url: confirmJsonUrl + "?path=" + jsonModel.pathJsonFormat,
+            success: function (response) {
+                console.log("Confirm Success : ",response);
+                alert(response);
+            }
+        })
+    }
     function writeJson() {
         let mainpage = {
             type: $('#type').val(),
@@ -378,6 +396,7 @@
             contentType:"application/json",
             success: function (response) {
                 console.log("write Success : ",response);
+                readJson();
                 alert("Lưu thành công");
             },
             error:function (error) {

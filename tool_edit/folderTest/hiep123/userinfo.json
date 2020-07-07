@@ -1,1 +1,21 @@
-{"dcmm":"123"}
+{
+  "userInfo": {
+    "passport": {
+      "mainpage": {
+        "type": "P",
+        "code": "VNM",
+        "passportNumber": "C3504085",
+        "name": "Nguyễn Ngọc Khánh",
+        "nationality": "VN",
+        "dateOfBirth": "04/09/1993",
+        "placeOfBirth": "Hải Phòng",
+        "sex": "W",
+        "issueDate": "12/06/2017",
+        "expiryDate": "12/06/2027",
+        "issuePlace": "Cục Quản lý xuất nhập cảnh",
+        "mrz1": "",
+        "mrz2": ""
+      }
+    }
+  }
+}
